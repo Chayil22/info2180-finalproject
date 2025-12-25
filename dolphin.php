@@ -63,10 +63,24 @@ switch ($action) {
         session_destroy();
         echo 'Logged out';
         break;
-        
+
     case 'dashboard':
         require_login();
         echo 'Welcome, ' . $_SESSION['user_name'];
+        break;
+
+    case 'users':
+        require_login();
+
+        $stmt = $conn->query(
+            'SELECT id, firstname, lastname, email, role, created_at
+             FROM users
+             ORDER BY lastname, firstname'
+        );
+
+        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        header('Content-Type: application/json');
+        echo json_encode($users);
         break;
 
     default:
