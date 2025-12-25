@@ -63,6 +63,11 @@ switch ($action) {
         session_destroy();
         echo 'Logged out';
         break;
+        
+    case 'dashboard':
+        require_login();
+        echo 'Welcome, ' . $_SESSION['user_name'];
+        break;
 
     default:
         echo 'Dolphin CRM - Project 2';
