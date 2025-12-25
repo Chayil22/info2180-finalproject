@@ -133,6 +133,83 @@ switch ($action) {
             echo 'Unable to create user';
         }
         break;
+ 
+    case 'create_contact':
+        require_login();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo 'Invalid request method';
+            exit;
+        }
+
+        $title = trim($_POST['title'] ?? '');
+        $firstname = trim($_POST['firstname'] ?? '');
+        $lastname = trim($_POST['lastname'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $telephone = trim($_POST['telephone'] ?? '');
+        $company = trim($_POST['company'] ?? '');
+        $type = trim($_POST['type'] ?? '');
+        $assigned_to = (int)($_POST['assigned_to'] ?? 0);
+
+        if (
+            $title === '' || $firstname === '' || $lastname === '' || $email === '' ||
+            $telephone === '' || $company === '' || $type === '' || $assigned_to <= 0
+        ) {
+            http_response_code(400);
+            echo 'All fields are required';
+            exit;
+        }
+
+        $stmt = $conn->prepare(
+            'INSERT INTO contacts (title, firstname, lastname, email, telephone, company, type, assigned_to, created_by, created_at, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())'
+        );
+
+        try {
+            $stmt->execute([
+                $title,
+                $firstname,
+                $lastname,
+                $email,
+                $telephone,
+                $company,
+                $type,
+                $assigned_to,
+                $_SESSION['user_id']
+            ]);
+
+            echo 'Contact created';
+        } catch (PDOException $e) {
+            http_response_code(400);
+            echo 'Unable to create contact';
+        }
+        break;
+
+    case 'contact':
+        require_login();
+
+        $id = (int)($_GET['id'] ?? 0);
+        if ($id <= 0) {
+            http_response_code(400);
+            echo 'Contact id is required';
+            exit;
+        }
+
+        $stmt = $conn->prepare('SELECT * FROM contacts WHERE id = ?');
+        $stmt->execute([$id]);
+        $contact = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$contact) {
+            http_response_code(404);
+            echo 'Contact not found';
+            exit;
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode($contact);
+        break;
+
 
     default:
         echo 'Dolphin CRM - Project 2';
