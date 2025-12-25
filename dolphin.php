@@ -18,6 +18,20 @@ function require_login()
     }
 }
 
+/**
+ * Ensure the user is an admin
+ */
+function require_admin()
+{
+    require_login();
+
+    if (($_SESSION['user_role'] ?? '') !== 'Admin') {
+        http_response_code(403);
+        echo 'Admin access required';
+        exit;
+    }
+}
+
 switch ($action) {
 
     case 'login':
@@ -37,8 +51,8 @@ switch ($action) {
         }
 
         $stmt = $conn->prepare(
-            'SELECT id, firstname, lastname, password, role 
-             FROM users 
+            'SELECT id, firstname, lastname, password, role
+             FROM users
              WHERE email = ?'
         );
         $stmt->execute([$email]);
@@ -81,6 +95,43 @@ switch ($action) {
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
         header('Content-Type: application/json');
         echo json_encode($users);
+        break;
+
+    case 'add_user':
+        require_admin();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo 'Invalid request method';
+            exit;
+        }
+
+        $firstname = trim($_POST['firstname'] ?? '');
+        $lastname = trim($_POST['lastname'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $role = trim($_POST['role'] ?? '');
+
+        if ($firstname === '' || $lastname === '' || $email === '' || $password === '' || $role === '') {
+            http_response_code(400);
+            echo 'All fields are required';
+            exit;
+        }
+
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare(
+            'INSERT INTO users (firstname, lastname, password, email, role, created_at)
+             VALUES (?, ?, ?, ?, ?, NOW())'
+        );
+
+        try {
+            $stmt->execute([$firstname, $lastname, $hashed, $email, $role]);
+            echo 'User created';
+        } catch (PDOException $e) {
+            http_response_code(400);
+            echo 'Unable to create user';
+        }
         break;
 
     default:
