@@ -210,6 +210,37 @@ switch ($action) {
         echo json_encode($contact);
         break;
 
+    case 'add_note':
+        require_login();
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo 'Invalid request method';
+            exit;
+        }
+
+        $contact_id = (int)($_POST['contact_id'] ?? 0);
+        $comment = trim($_POST['comment'] ?? '');
+
+        if ($contact_id <= 0 || $comment === '') {
+            http_response_code(400);
+            echo 'Contact id and comment are required';
+            exit;
+        }
+
+        $stmt = $conn->prepare(
+            'INSERT INTO notes (contact_id, comment, created_by, created_at)
+             VALUES (?, ?, ?, NOW())'
+        );
+
+        try {
+            $stmt->execute([$contact_id, $comment, $_SESSION['user_id']]);
+            echo 'Note added';
+        } catch (PDOException $e) {
+            http_response_code(400);
+            echo 'Unable to add note';
+        }
+        break;
 
     default:
         echo 'Dolphin CRM - Project 2';
