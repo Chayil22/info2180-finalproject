@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Dolphin CRM</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+
+		<link
+    		rel="stylesheet"
+    		href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    		crossorigin="anonymous"
+    		referrerpolicy="no-referrer"
+  		>
+
+		<link rel="stylesheet" href="styles.css">
+	</head>
+
+	<body>
+		<header class="topbar">
+			<div class="brand">
+				<img src="./images/dolphin_logo.png" alt="" class="brand-icon">
+				<span>Dolphin CRM</span>
+			</div>
+		</header>
+
+		<main class="page">
+			<section id="loginView" class="view">
+				<div class="card">
+					<h1>Login</h1>
+
+					<form id="loginForm">
+						<input
+							id="email"
+							type="email"
+							name="email"
+							placeholder="Email address"
+							autocomplete="username"
+							required
+						>
+
+						<input
+							id="password"
+							type="password"
+							name="password"
+							placeholder="Password"
+							autocomplete="current-password"
+							required
+						>
+
+						<button type="submit" class="login-btn">
+  							<i class="fa-solid fa-lock"></i>
+  							<span>Login</span>
+						</button>
+						<p id="loginMsg" class="msg" aria-live="polite"></p>
+					</form>
+
+					<div class="footer">
+						Copyright © 2022 Dolphin CRM
+					</div>
+				</div>
+			</section>
+
+			<section id="appView" class="view hidden">
+				<aside class="sidebar" aria-label="Main navigation">
+  					<a href="#" data-route="dashboard">
+   						<i class="fa-solid fa-house"></i>
+   						Home
+  					</a>
+
+  					<a href="#" data-route="new-contact">
+    					<i class="fa-solid fa-user-plus"></i>
+    					New Contact
+  					</a>
+
+  					<a href="#" data-route="users" id="usersNav">
+    					<i class="fa-solid fa-users"></i>
+    					Users
+  					</a>
+
+  					<a href="#" id="logoutLink">
+    					<i class="fa-solid fa-right-from-bracket"></i>
+    					Logout
+  					</a>
+				</aside>
+				<section class="content">
+					<div id="content"></div>
+				</section>
+			</section>
+		</main>
+
+		<script src="app.js"></script>
+	</body>
+</html>
